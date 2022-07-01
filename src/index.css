@@ -1,0 +1,100 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.wrapper {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+  background-color: rgb(163, 136, 231);
+  
+}
+
+.area {
+  
+  height: 80vh;
+  width: 100vw;
+
+  background-image: linear-gradient(rgba(0, 0, 0, 0) 18%, rgb(163, 136, 231) 80%), linear-gradient(rgb(163, 136, 231) 5%, rgba(0, 0, 0, 0) 20%), linear-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
+}
+
+
+.num {
+  font-size: 20px;
+  position: absolute;
+  top: 50px;
+  left: 50px;
+}
+
+.origin {
+  position: absolute;
+  top: 0px;
+  left: calc(50% - 1px);
+  width: 2px;
+  bottom: 0px;
+  background-color: rgb(196, 55, 4);
+  height: 50%;
+  z-index: 1;
+}
+
+.pointer {
+  background-color: green;
+  height: 50px;
+  width: 6px;
+  position: absolute;
+  top: 25%;
+  transition: all .4s;
+    -moz-transition: all .4s;
+    -webkit-transition: all .4s;
+    -o-transition: all .4s;
+  /* left: calc(50% - 3px); */
+  z-index: 4;
+}
+
+
+.d-note {
+  position: absolute;
+  font-size: 30px;
+  height: 50px;
+  width: 50px;
+  top: 50%;
+  margin-right: 30%;
+  border-radius: 50%;
+  z-index: 5;
+  
+}
+
+.g-note {
+  position: absolute;
+  font-size: 30px;
+  height: 50px;
+  width: 50px;
+  top: 71%;
+  margin-left: 27%;
+  border-radius: 50%;
+  z-index: 5;
+}
+
+.green {
+  background-color: green;
+}
+
+.img {
+  position: absolute;
+
+  width: 100px;
+  left: 37%;
+  top: 39%;
+  z-index: 2;
+  bottom: 0;
+}
+
+
+
