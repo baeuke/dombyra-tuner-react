@@ -51,9 +51,9 @@ body {
   position: absolute;
   top: 25%;
   transition: all .4s;
-    -moz-transition: all .4s;
+    /* -moz-transition: all .4s;
     -webkit-transition: all .4s;
-    -o-transition: all .4s;
+    -o-transition: all .4s; */
   /* left: calc(50% - 3px); */
   z-index: 4;
 }
@@ -88,7 +88,6 @@ body {
 
 .img {
   position: absolute;
-
   width: 100px;
   left: 37%;
   top: 39%;
@@ -96,5 +95,15 @@ body {
   bottom: 0;
 }
 
+.qobyz {
+  color: white;
+  font-size: 20px;
+  position: absolute;
+  top: 80px;
+  left: 50px;
+}
 
+.qobyz:hover {
+  cursor: pointer;
+}
 

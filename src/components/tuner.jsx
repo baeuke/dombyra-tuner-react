@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+
+import { Link } from "react-router-dom";
 import ml5 from "ml5";
 
 
@@ -8,12 +10,11 @@ import ml5 from "ml5";
 let audioContext;
 let pitch;
 
+let threshold = 1;
 
+// let diffD;
+// let diffG;
 
-let diffD;
-let diffG;
-
-let absDiff = 0;
 
 
 async function setup() {
@@ -35,6 +36,16 @@ function modelLoaded() {
    console.log("model's loaded");
 }
 
+// const playAudio = async () => {
+//       const importRes = await import("tuning_Audio.mp3"); // make sure the path is correct
+//       var audio = new Audio(importRes.default);
+//       try {
+//          await audio.play();
+//          console.log("Playing audio");
+//       } catch (err) {
+//          console.log("Failed to play, error: " + err);
+//       }
+// }
 // let dFunc = () => {
 //       diff = freq - 146.8324;
 //       absDiff = Math.abs(diff);
@@ -60,33 +71,48 @@ function modelLoaded() {
 // }
 
 export const Tuner = () => {
-   const [frequency, setFrequency] = useState(0);
+   const [frequency, setFrequency] = useState({
+      diffD:0,
+      diffG:0,
+      freq:0,
+   });
    const [note, setNote] = useState("");
+   // const [audio, setAudio] = useState(false);
+
+   const audio = new Audio("tuner.mp3");
    
    // const [position, setPosition] = useState('calc(50% - 3px)');
+
+
+   // console.log(pitch);
 
    useEffect(() => {
       const interval = setInterval(() => {
          if (pitch) {
-            pitch.getPitch((err, frequency) => {
-               if (frequency) {
+            pitch.getPitch((err, frq) => {
+               if (frq) {
                   // freq = frequency
-                  diffG = frequency - 195.9977;
+
                   
-                  diffD = frequency - 146.8324;
+                  // diffG = frq - 195.9977;
+                  
+                  // diffD = frq - 146.8324;
                   // diffG = freq - 195.9977;
                   // helper (freq);
-                  setFrequency(frequency.toFixed(2));
+                  setFrequency({
+                     diffD:frq - 146.8324,
+                     diffG:frq - 195.9977,
+                     freq:frq.toFixed(2)});
                   // help ();
-
+                  
                   // setFrequency(freq);
                } else {
-                  setFrequency("No pitch detected");
+                  setFrequency((prev)=>({...prev,freq:"No pitch detected"}));
                }
             });
          }
       }, 50);
-      return () => {clearInterval(interval)}
+      return () => {clearInterval(interval)};
    }, []);
 
 
@@ -154,28 +180,36 @@ export const Tuner = () => {
       left: `30%`
    };
 
-   if (note == "G") {
-      absDiff = Math.abs(diffG);
+   if (note == "G" && frequency.freq && frequency.diffG) {
+      const absDiff = Math.abs(frequency.diffG);
       if (absDiff < 1) {
          pStyle.left = 'calc(50% - 3px)';
-      } else if (diffG < -2) {
+         // playAudio();
+         
+         audio.play();
+         console.log("Audio had to play");
+      } else if (frequency.diffG < -2) {
          pStyle.left = `calc(50% - 3px - ${absDiff}px)`;
-      } else if (diffG > 2) {
+      } else if (frequency.diffG > 2) {
          pStyle.left = `calc(50% - 3px + ${absDiff}px)`;
       }
    }
 
-   if (note == "D") {
-      absDiff = Math.abs(diffD);
-      if (absDiff < 1) {
+   if (note == "D"  && frequency.freq && frequency.diffD) {
+      const absDiff = Math.abs(frequency.diffD);
+      if (absDiff <= 1) {
          pStyle.left = 'calc(50% - 3px)';
-      } else if (diffD < -2) {
+         // playAudio();
+         audio.play();
+      } else if (frequency.diffD < (-1*threshold)) {
          pStyle.left = `calc(50% - 3px - ${absDiff}px)`;
-      } else if (diffD > 2) {
+      } else if (frequency.diffD > threshold) {
          pStyle.left = `calc(50% - 3px + ${absDiff}px)`;
       }
    }
-
+   // helper () {
+      
+   // }
    return (
       <>
          <div className="wrapper">
@@ -183,6 +217,9 @@ export const Tuner = () => {
                <div className="origin"></div>
                <div className="pointer" style={pStyle}></div>
             </div>
+
+            <Link to="/qobyz"><div className="qobyz">prima-qobyz</div></Link>
+
             {/* style={{ left: `calc(50% - 3px + ${frq/10}px)`, position: "absolute"}} */}
             <button
                className={`d-note${dColorClass}`}
@@ -190,7 +227,7 @@ export const Tuner = () => {
                   setNote("D");
                }}
             >D</button>
-
+            
             <button
                className={`g-note${gColorClass}`}
                onClick={() => {
@@ -198,7 +235,7 @@ export const Tuner = () => {
                }}
             >G</button>
             <div className="img"><img width="390px" src={"paintDombyra.png"}/></div>
-            <div className="num">{frequency}</div>
+            <div className="num">{frequency.freq}</div>
          </div>
       </>
    );
