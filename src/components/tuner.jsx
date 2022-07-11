@@ -1,23 +1,15 @@
 import { useEffect, useState } from "react";
-
 import { Link } from "react-router-dom";
 import ml5 from "ml5";
 
-
 // ! если разница между настоящим звуком и следующим слишком большая, то не изменять положение пойнтера
-
-
-const audio = new Audio("tuner.mp3");
 
 let audioContext;
 let pitch;
+let threshold = 2;
+let position = "30%";
 
-let threshold = 1;
-
-// let diffD;
-// let diffG;
-
-
+// const model_url = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
 
 async function setup() {
    audioContext = new AudioContext();
@@ -31,12 +23,15 @@ async function setup() {
 setup();
 
 function startPitch(stream, audioContext) {
-   pitch = ml5.pitchDetection("model", audioContext, stream, modelLoaded); //instance ?
+   pitch = ml5.pitchDetection('model', audioContext, stream, modelLoaded); //instance ?
 }
 
 function modelLoaded() {
    console.log("model's loaded");
 }
+
+
+const audio = new Audio("tuner.mp3");
 
 const playAudio = async () => {
    // const importRes = await import("./audio/tuner.mp3"); // make sure the path is correct
@@ -48,44 +43,15 @@ const playAudio = async () => {
       console.log("Failed to play, error: " + err);
    }
 }
-// let dFunc = () => {
-//       diff = freq - 146.8324;
-//       absDiff = Math.abs(diff);
-//       if (absDiff < 1) {
-//          return 'calc(50% - 3px)';
-//       } else if (diff < -2) {
-//          return `calc(50% - 3px - ${absDiff}px)`;
-//       } else if (diff > 2) {
-//          return `calc(50% - 3px + ${absDiff}px)`;
-//       }
-//    }
 
-// let gFunc = () => {
-//       diff = freq - 195.9977;
-//       absDiff = Math.abs(diff);
-//       if (absDiff < 1) {
-//          return 'calc(50% - 3px)';
-//       } else if (diff < -2) {
-//          return `calc(50% - 3px - ${absDiff}px)`;
-//       } else if (diff > 2) {
-//          return `calc(50% - 3px + ${absDiff}px)`;
-//       }
-// }
+
 
 export const Tuner = () => {
-   const [frequency, setFrequency] = useState({
-      diffD: 0,
-      diffG: 0,
-      freq: 0,
-   });
+   const [frequency, setFrequency] = useState(0);
    const [note, setNote] = useState("");
-   // const [audio, setAudio] = useState(false);
+   const [diffD, setDiffD] = useState(0);
+   const [diffG, setDiffG] = useState(0);
 
-
-   // const [position, setPosition] = useState('calc(50% - 3px)');
-
-
-   // console.log(pitch);
 
    // const getFreq = () => {
    //    console.log('pitch', pitch);
@@ -119,146 +85,86 @@ export const Tuner = () => {
    //    }
    // }
 
+
+
+
+
    useEffect(() => {
       // console.log('1');
       // getFreq()
       // console.log('2');
+
       const interval = setInterval(() => {
          if (pitch) {
             pitch.getPitch((err, frq) => {
+               console.log('?');
+               // console.log(frq);
                if (frq) {
-                  // freq = frequency
-
-
                   // diffG = frq - 195.9977;
-
                   // diffD = frq - 146.8324;
-                  // diffG = freq - 195.9977;
-                  // helper (freq);
-                  setFrequency({
-                     diffD: frq - 146.8324,
-                     diffG: frq - 195.9977,
-                     freq: frq.toFixed(2)
-                  });
 
+                  setFrequency(frq.toFixed(2));
+                  setDiffD(frq - 146.8324);
+                  setDiffG(frq - 195.9977);
+                  
                   // setFrequency(freq);
                } else {
-                  setFrequency((prev)=>({...prev,freq:"No pitch detected"}));
+                  setFrequency("No pitch detected");
                }
-
             });
-
          }
-      }, 50);
-      return () => {clearInterval(interval)};
+      }, 100);
+      return () => { 
+         
+         clearInterval(interval); 
+         // audioContext.close();
+      };
    }, []);
-
-
-   // let help = () => {
-   //    if (note == "D") {
-   //       absDiff = toString(Math.abs(diffD));
-   //       if (absDiff < 1) {
-   //          setPtrPosition('calc(50% - 3px)');
-   //       } else if (diffD < -2) {
-   //          setPtrPosition(`calc(50% - 3px - ${absDiff}px)`);
-   //       } else if (diffD > 2) {
-   //          setPtrPosition(`calc(50% - 3px + ${absDiff}px)`);
-   //       }
-   //    }
-   // };
-
-   // let posPointer = (frq) => {
-   //    if (note == "D") {
-   //       diff = frq - 146.8324;
-   //    } else if (note == "G") {
-   //       diff = frq - 195.9977;
-   //    }
-   //    console.log(diff);
-   // };
 
 
 
    let dColorClass = (note === "D") ? " green" : "";
    let gColorClass = (note === "G") ? " green" : "";
 
-   // let ptrPos = (note == "D") ? dFunc() : 
-   //    (note == "G") ? gFunc() : "calc(50% - 3px)";
 
-   // if (note == "D") {
-   //    absDiff = Math.abs(diffD);
-   //    if (absDiff < 1) {
-   //       ptrPos = 'calc(50% - 3px)';
-   //    } else if (diffD < -2) {
-   //       ptrPos = `calc(50% - 3px - ${absDiff}px)`;
-   //    } else if (diffD > 2) {
-   //       ptrPos = `calc(50% - 3px + ${absDiff}px)`;
-   //    }
-   // }
-
-   // if (note == "G") {
-   //    absDiff = Math.abs(diffG);
-   //    if (absDiff < 1) {
-   //       ptrPos = 'calc(50% - 3px)';
-   //    } else if (diffG < -2) {
-   //       ptrPos = `calc(50% - 3px - ${absDiff}px)`;
-   //    } else if (diffG > 2) {
-   //       ptrPos = `calc(50% - 3px + ${absDiff}px)`;
-   //    }
-   // }
-
-
-   //RABOCHIY: *******
-   // let pStyle = {
-   //    left: `calc(50% - 3px + ${diff}px)`
-   // };
-   //******** */
-
-
-   let pStyle = {
-      left: `30%`
-   };
-
-   if (note == "G" && frequency.freq) {
-      const absDiff = Math.abs(frequency.diffG);
-      if (absDiff < 1) {
-         pStyle.left = 'calc(50% - 3px)';
-         playAudio();
-
-         // audio.play();
-         console.log("Audio had to play");
-      } else if (frequency.diffG < -2) {
-         pStyle.left = `calc(50% - 3px - ${absDiff}px)`;
-      } else if (frequency.diffG > 2) {
-         pStyle.left = `calc(50% - 3px + ${absDiff}px)`;
+   useEffect(() => {
+      if (note == "G" && diffG) {
+         const absDiff = Math.abs(diffG);
+         if (absDiff < 0.3) {
+            position = 'calc(50% - 3px)';
+            console.log(diffG)
+            playAudio();
+         } else if (diffG <= -2) {
+            position = `calc(50% - 3px - ${ parseInt(absDiff, 0)/2 }px)`;
+         } else if (diffG >= 2) {
+            position = `calc(50% - 3px + ${ parseInt(absDiff, 0)/2 }px)`;
+         }
       }
-   }
 
-   if (note == "D" && frequency.freq && frequency.diffD) {
-      const absDiff = Math.abs(frequency.diffD);
-      if (absDiff <= 1) {
-         pStyle.left = 'calc(50% - 3px)';
-         playAudio();
-         // audio.play();
-      } else if (frequency.diffD < (-1 * threshold)) {
-         pStyle.left = `calc(50% - 3px - ${absDiff}px)`;
-      } else if (frequency.diffD > threshold) {
-         pStyle.left = `calc(50% - 3px + ${absDiff}px)`;
+      if (note == "D" && diffD) {
+         const absDiff = Math.abs(diffD);
+         if (absDiff <= 0.3) {
+            position = 'calc(50% - 3px)';
+            playAudio();
+         } else if (diffD <= (-1 * threshold)) {
+            position = `calc(50% - 3px - ${ parseInt(absDiff, 0)/2 }px)`;
+         } else if (diffD >= threshold) {
+            position = `calc(50% - 3px + ${ parseInt(absDiff, 0)/2 }px)`;
+         }
       }
-   }
-   // helper () {
+   }, [note, diffG, diffD]);
+   
 
-   // }
    return (
       <>
          <div className="wrapper">
             <div className="area">
                <div className="origin"></div>
-               <div className="pointer" style={pStyle}></div>
+               <div className="pointer" style={{ left: position }}></div>
             </div>
 
             <Link to="/qobyz"><div className="qobyz">prima-qobyz</div></Link>
 
-            {/* style={{ left: `calc(50% - 3px + ${frq/10}px)`, position: "absolute"}} */}
             <button
                className={`d-note${dColorClass}`}
                onClick={() => {
@@ -273,7 +179,7 @@ export const Tuner = () => {
                }}
             >G</button>
             <div className="img"><img width="390px" src={"paintDombyra.png"} /></div>
-            <div className="num">{frequency.freq}</div>
+            <div className="num">{frequency}</div>
          </div>
       </>
    );
